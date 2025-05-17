@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class StudentManager {
-    private static final String FILE_PATH = "C:\\Project\\HomeTutorSearchBookingSystem\\src\\main\\resources\\data\\students.txt";
+    private static final String FILE_PATH = "C:\\Project\\PGNO-54_Home-Tutor-Booking-Systems\\src\\main\\resources\\data\\students.txt";
     private List<Student> students;
 
     public StudentManager() throws IOException {

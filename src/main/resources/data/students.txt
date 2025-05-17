@@ -1,0 +1,6 @@
+24101401,Akila Perera,akila2004,111,Science,akila2004@gmail.com
+24101402,Janith Bhagya,janith23,112,History,janith22@gmial.com
+24101403,Aloka Perera,alok,113,Accounting,aloka234@gmail.com
+24101405,Nipula Sathsara,nipula4,111,Science,nipula20@gmail.com
+24101406,Didula Damith,dede,111,Science,didula@gmail.com
+24101407,Adeesha Akeeth,adeesha6,111,History;Mathematics,adeesha45@gmail.com
