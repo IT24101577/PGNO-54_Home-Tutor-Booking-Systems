@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdminManager {
-    private static final String FILE_PATH = "C:\\Project\\HomeTutorSearchBookingSystem\\src\\main\\resources\\data\\admins.txt";
+    private static final String FILE_PATH = "C:\\Project\\PGNO-54_Home-Tutor-Booking-Systems\\src\\main\\resources\\data\\admins.txt";
     private List<Admin> admins;
 
     public AdminManager() throws IOException {
