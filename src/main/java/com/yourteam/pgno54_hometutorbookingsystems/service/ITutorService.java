@@ -9,6 +9,6 @@ public interface ITutorService {
     void addTutor(Tutor tutor) throws IOException;
     void updateTutor(Tutor tutor) throws IOException;
     void deleteTutor(String id) throws IOException;
-    List<Tutor> searchTutors(String subject, String name, double minRating);
-    List<Tutor> getAllTutors();
+    List<Tutor> searchTutors(String subject, String name, double minRating); // Remains List for flexibility
+    Tutor[] getAllTutors(); // Changed from List<Tutor> to Tutor[]
 }

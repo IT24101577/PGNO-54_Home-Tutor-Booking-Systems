@@ -3,6 +3,7 @@ package com.yourteam.pgno54_hometutorbookingsystems.servlet;
 import com.yourteam.pgno54_hometutorbookingsystems.model.Tutor;
 import com.yourteam.pgno54_hometutorbookingsystems.service.ITutorService;
 import com.yourteam.pgno54_hometutorbookingsystems.service.TutorManager;
+import com.yourteam.pgno54_hometutorbookingsystems.util.CustomList;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @WebServlet("/TutorServlet")
@@ -33,7 +35,7 @@ public class TutorServlet extends HttpServlet {
         if ("profile".equals(action)) {
             String id = request.getParameter("id");
             if (id != null && !id.trim().isEmpty()) {
-                Tutor tutor = tutorService.getAllTutors().stream()
+                Tutor tutor = Arrays.stream(tutorService.getAllTutors())
                         .filter(t -> t.getId().equals(id))
                         .findFirst()
                         .orElse(null);

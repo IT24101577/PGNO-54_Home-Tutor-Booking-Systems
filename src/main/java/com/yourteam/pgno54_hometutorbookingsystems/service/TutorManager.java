@@ -2,9 +2,8 @@ package com.yourteam.pgno54_hometutorbookingsystems.service;
 
 import com.yourteam.pgno54_hometutorbookingsystems.model.Tutor;
 import com.yourteam.pgno54_hometutorbookingsystems.util.TutorBST;
-
 import java.io.*;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +18,7 @@ public class TutorManager implements ITutorService { // Polymorphism: implements
 
     private File getResourceFile() throws IOException {
         String resourcePath = FILE_PATH.replace("/", File.separator);
-        File file = new File("C:\\Project\\HomeTutorSearchBookingSystem\\src\\main\\resources\\" + resourcePath);
+        File file = new File("C:\\Project\\PGNO-54_Home-Tutor-Booking-Systems\\src\\main\\resources\\" + resourcePath);
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             file.createNewFile();
@@ -65,15 +64,15 @@ public class TutorManager implements ITutorService { // Polymorphism: implements
     @Override
     public void addTutor(Tutor tutor) throws IOException {
         tutor.setSubjectExpertise(tutor.getSubjectExpertise().toLowerCase());
-        List<Tutor> existingTutors = getAllTutors();
+        Tutor[] existingTutors = getAllTutors();
 
         // Log all existing tutor IDs for debugging
         System.out.println("Checking for duplicate ID: " + tutor.getId());
         System.out.println("Existing tutor IDs: " +
-                existingTutors.stream().map(Tutor::getId).collect(Collectors.joining(", ")));
+                Arrays.stream(existingTutors).map(Tutor::getId).collect(Collectors.joining(", ")));
 
         // Check for duplicate ID
-        boolean idExists = existingTutors.stream()
+        boolean idExists = Arrays.stream(existingTutors)
                 .anyMatch(t -> t.getId().trim().equals(tutor.getId().trim()));
         if (idExists) {
             throw new IOException("A tutor with ID " + tutor.getId() + " already exists.");
@@ -82,10 +81,10 @@ public class TutorManager implements ITutorService { // Polymorphism: implements
         // Log all existing tutor names for debugging
         System.out.println("Checking for duplicate name: " + tutor.getName());
         System.out.println("Existing tutor names: " +
-                existingTutors.stream().map(Tutor::getName).collect(Collectors.joining(", ")));
+                Arrays.stream(existingTutors).map(Tutor::getName).collect(Collectors.joining(", ")));
 
         // Check for duplicate name (case-insensitive)
-        boolean nameExists = existingTutors.stream()
+        boolean nameExists = Arrays.stream(existingTutors)
                 .anyMatch(t -> t.getName().trim().toLowerCase().equals(tutor.getName().trim().toLowerCase()));
         if (nameExists) {
             throw new IOException("A tutor with name " + tutor.getName() + " already exists.");
@@ -116,15 +115,12 @@ public class TutorManager implements ITutorService { // Polymorphism: implements
     @Override
     public void updateTutor(Tutor tutor) throws IOException {
         tutor.setSubjectExpertise(tutor.getSubjectExpertise().toLowerCase());
-        List<Tutor> tutors = getAllTutors();
+        tutorBST.update(tutor);
+        Tutor[] tutors = getAllTutors();
         File file = getResourceFile();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Tutor t : tutors) {
-                if (t.getId().equals(tutor.getId())) {
-                    writer.write(tutor.getId() + "," + tutor.getName() + "," + tutor.getSubjectExpertise() + "," + tutor.getRating());
-                } else {
-                    writer.write(t.getId() + "," + t.getName() + "," + t.getSubjectExpertise() + "," + t.getRating());
-                }
+                writer.write(t.getId() + "," + t.getName() + "," + t.getSubjectExpertise() + "," + t.getRating());
                 writer.newLine();
             }
             System.out.println("Updated tutors in " + file.getAbsolutePath());
@@ -135,7 +131,8 @@ public class TutorManager implements ITutorService { // Polymorphism: implements
 
     @Override
     public void deleteTutor(String id) throws IOException {
-        List<Tutor> tutors = getAllTutors();
+        tutorBST.delete(id);
+        Tutor[] tutors = getAllTutors();
         File file = getResourceFile();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Tutor t : tutors) {
@@ -153,34 +150,32 @@ public class TutorManager implements ITutorService { // Polymorphism: implements
     @Override
     public List<Tutor> searchTutors(String subject, String name, double minRating) {
         System.out.println("Searching tutors - subject: " + subject + ", name: " + name + ", minRating: " + minRating);
-        List<Tutor> tutors = new ArrayList<>();
+        Tutor[] tutorsArray = getAllTutors();
+
+        // Convert Tutor[] to List for stream operations
+        List<Tutor> tutors = Arrays.asList(tutorsArray);
 
         // Handle subject search using BST for exact match
         if (subject != null && !subject.isEmpty()) {
             Tutor subjectTutor = tutorBST.search(subject.toLowerCase());
             if (subjectTutor != null && subjectTutor.getRating() >= minRating) {
-                tutors.add(subjectTutor);
+                tutors = Arrays.asList(subjectTutor); // Single tutor as List
             }
         }
 
         // Handle name search and combine with subject results
         if (name != null && !name.isEmpty()) {
-            List<Tutor> nameMatches = getAllTutors().stream()
+            List<Tutor> nameMatches = Arrays.stream(tutorsArray)
                     .filter(tutor -> tutor.getName().toLowerCase().contains(name.toLowerCase()))
                     .filter(tutor -> tutor.getRating() >= minRating)
-                    .filter(tutor -> subject.isEmpty() || tutor.getSubjectExpertise().equals(subject.toLowerCase()))
+                    .filter(tutor -> subject == null || subject.isEmpty() || tutor.getSubjectExpertise().equals(subject.toLowerCase()))
                     .collect(Collectors.toList());
-            // Add name matches, avoiding duplicates
-            for (Tutor tutor : nameMatches) {
-                if (!tutors.contains(tutor)) {
-                    tutors.add(tutor);
-                }
-            }
+            tutors = nameMatches;
         }
 
         // If no subject or name provided, return all tutors meeting minRating
         if ((subject == null || subject.isEmpty()) && (name == null || name.isEmpty())) {
-            tutors = getAllTutors().stream()
+            tutors = Arrays.stream(tutorsArray)
                     .filter(tutor -> tutor.getRating() >= minRating)
                     .collect(Collectors.toList());
         }
@@ -189,7 +184,7 @@ public class TutorManager implements ITutorService { // Polymorphism: implements
     }
 
     @Override
-    public List<Tutor> getAllTutors() {
+    public Tutor[] getAllTutors() {
         return tutorBST.getAllTutors();
     }
 }
